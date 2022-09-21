@@ -72,11 +72,12 @@ def team_schedule_list(schedules_list, teams_list, week):
                 weeks["source_team_id"] = int(source_team_id)
 
         list.append(weeks)
+        
     return list
 
 
 # loops through team_schedule list to get list of all teams in 18 weeks of the season 
-def all_teams_schedule(schedules, teams, weeks):
+def full_schedule_list(schedules, teams, weeks):
     games = []
     for i in range(1, weeks + 1):
         s = "W"
@@ -101,40 +102,43 @@ def insert_schedules(schedules):
                 conn.execute("""INSERT INTO schedules (event_number, week_number, source_team_id, location, opponent_id) VALUES (?, ?, ?, ?, ?)""", (j["event_number"], j["week_number"], j["source_team_id"], j["location"], j["opponent_id"]))
             except KeyError:
                 conn.execute("""INSERT INTO schedules (event_number, week_number, source_team_id, location) VALUES (?, ?, ?, ?)""", (j["event_number"], j["week_number"], j["source_team_id"], "BYE"))
-
+    conn.commit()
 
 def main():
     schedules = file_list("nfl_2022_schedule.csv")
     teams = file_list("nfl_teams.csv")
-
-    teams_schedule = all_teams_schedule(schedules, teams, TOTAL_WEEKS)
-    insert_schedules(teams_schedule)
+    teams_schedule = full_schedule_list(schedules, teams, TOTAL_WEEKS)
     
-    for row in cur:
-        print(row)
-
-    '''ONLY THING LEFT IS COMMIT, KEEP CHECKING FOR OTHER BUGS, THEN TEST QUERYS'''
-
-    #print_all_teams_schedule(teams_schedule)
-
-    # use this for 1 week
-    #print(team_schedule_list(schedules, teams, "W13"))
-    #l = team_schedule_list(schedules, teams, "W13")[0]["week_number"]
-
-    # if teams needs to be made again uncomment next line
-    #insert_teams(teams)
-
-
-'''
-    THIS IS WHAT A QUERY TO THE DATABASE LOOKS LIKE
-
-    cur.execute("SELECT * FROM schedules where week_number = ?", (13, ))
-
-'''
 
 
 if __name__ == "__main__":
     main()
+
+    '''FIGURE OUT HOW TO QUERY TABLE'''
+
+    '''
+                            COMMMENTS
+        # IF DB NEEDS TO BE MADE AGAIN RE-RUN THESE LINES
+            #insert_schedules(teams_schedule)
+            #insert_teams(teams)
+
+        # use this to print 1 week
+            #print(team_schedule_list(schedules, teams, "W13"))
+            #l = team_schedule_list(schedules, teams, "W13")[0]["week_number"]
+
+        # use this to print all
+            #print_all_teams_schedule(teams_schedule)
+
+        #THIS IS WHAT A QUERY TO THE DATABASE LOOKS LIKE
+
+            #cur.execute("SELECT * FROM schedules where week_number = ?", (13, ))
+            
+            for i in cur:
+                print(i)
+
+    '''
+
+
 
 
 
